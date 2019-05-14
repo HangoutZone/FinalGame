@@ -1,0 +1,123 @@
+#include "pch.h"
+#include <SFML/Graphics.hpp>   //using namespace sf
+#include <time.h>
+
+//sfml sf uses FloatRect and has the method .getGloablBounds()
+bool intersects(sf::CircleShape &ball, sf::RectangleShape &slider) {
+	sf::FloatRect player = slider.getGlobalBounds();
+	sf::FloatRect pong = ball.getGlobalBounds();
+
+	return pong.intersects(player);
+}
+int main() {
+	//set the positon of the players and ball in the window
+	sf::VideoMode videomode(400, 400);
+	sf::RenderWindow window(videomode, "pong game");
+
+	sf::RectangleShape topBoarder;
+	topBoarder.setFillColor(sf::Color::Black);
+	topBoarder.setSize(sf::Vector2f(20, 400));
+	topBoarder.setPosition(400, 0);
+	topBoarder.rotate(90);
+
+	sf::RectangleShape bottomBoarder;
+	bottomBoarder.setFillColor(sf::Color::Black);
+	bottomBoarder.setSize(sf::Vector2f(20, 400));
+	bottomBoarder.setPosition(400, 380);
+	bottomBoarder.rotate(90);
+	sf::RectangleShape left;
+	sf::RectangleShape right;
+
+	//set the speed at which the ball moves
+	sf::Vector2<float>ballSpeed(0.12, 0.12);
+
+	//can set the player with the color and use vector
+	sf::RectangleShape PlayerOne;
+	PlayerOne.setFillColor(sf::Color::Red);
+	//vector with x,y  to set the size
+	PlayerOne.setSize(sf::Vector2f(20, 55));
+	//set the position of the player
+	PlayerOne.setPosition(30, 200);
+
+	sf::RectangleShape PlayerTwo;
+	PlayerTwo.setFillColor(sf::Color::Blue);
+	PlayerTwo.setSize(sf::Vector2f(20, 55));
+	PlayerTwo.setPosition(370, 200);
+
+	sf::CircleShape Ball;
+	Ball.setFillColor(sf::Color::Green);
+	Ball.setRadius(12);
+	Ball.setPosition(200, 200);
+
+	//set the area the ball goes for when the player loses/wins
+	sf::RectangleShape badZoneOne;
+	badZoneOne.setFillColor(sf::Color::Yellow);
+	badZoneOne.setSize(sf::Vector2f(10, 400));
+	badZoneOne.setPosition(390, 0);
+
+	sf::RectangleShape badZoneTwo;
+	badZoneTwo.setFillColor(sf::Color::Yellow);
+	badZoneTwo.setSize(sf::Vector2f(10, 400));
+	badZoneTwo.setPosition(0, 0);
+
+	while (window.isOpen()) {
+		//draw to the window and order matters therefore the backkground is drawn first
+		window.clear(sf::Color::Black);
+		window.draw(topBoarder);
+		window.draw(bottomBoarder);
+
+		window.draw(Ball);
+
+		window.draw(PlayerTwo);
+		window.draw(PlayerOne);
+
+		window.draw(badZoneOne);
+		window.draw(badZoneTwo);
+
+		window.display();
+
+		sf::Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+		}
+		//movement for the player, updates the vector with the 
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+			PlayerOne.move(0, -0.3);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+			PlayerOne.move(0, 0.3);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+			PlayerTwo.move(0, -0.3);
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+			PlayerTwo.move(0, 0.3);
+		}
+		if (intersects(Ball, badZoneOne)) {
+			char win[200] = "Player One wins!";
+			printf("%s", win);
+
+			sf::sleep(sf::seconds(3));
+			window.close();
+		}
+		if (intersects(Ball, badZoneTwo)) {
+			char win[200] = "Player Two wins!";
+			printf("%s", win);
+
+			sf::sleep(sf::seconds(3));
+			window.close();
+		}
+		if (intersects(Ball, topBoarder) || (intersects(Ball, bottomBoarder))) {
+			ballSpeed.y = -ballSpeed.y;
+		}
+		//when the ball collides with the slider
+		if (intersects(Ball, PlayerOne) || (intersects(Ball, PlayerTwo))) {
+			ballSpeed.x = -ballSpeed.x;
+		}
+		Ball.move(ballSpeed.x, ballSpeed.y);
+
+	}
+
+}
