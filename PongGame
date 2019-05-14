@@ -117,7 +117,6 @@ int main() {
 			ballSpeed.x = -ballSpeed.x;
 		}
 		Ball.move(ballSpeed.x, ballSpeed.y);
-
 	}
-
+	return 0;
 }
